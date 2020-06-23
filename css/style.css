@@ -1,0 +1,30 @@
+header,footer {
+    width: 100%;
+    background: #1395E4;
+    color: whitesmoke;
+    border: 1px solod #000;
+    box-sizing: border-box;
+    text-align: center;
+}
+main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    text-align: center;
+    flex-direction: column;
+}
+table,
+tr,
+td,
+th {
+    text-align: center;
+    border: 2px #1395E4 solid;
+}
+form {
+    display: flex;
+    flex-direction: column;
+}
+form ul {
+    list-style: none;
+}
