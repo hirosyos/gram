@@ -179,19 +179,18 @@ if ($status == false) {
     // $usrData[2] = readUserData(2);
   }
 
-  echo ('<pre>');
-  var_dump($usrData);
-  echo ('<pre>');
+  // echo ('<pre>');
+  // var_dump($usrData);
+  // echo ('<pre>');
 
-  $usrData2 = "あああああ";
 
   $myDataJson = json_encode($myData);
   $usrDataJson = json_encode($usrData);
 
-  echo ('<pre>');
-  var_dump($myDataJson);
-  var_dump($usrDataJson);
-  echo ('<pre>');
+  // echo ('<pre>');
+  // var_dump($myDataJson);
+  // var_dump($usrDataJson);
+  // echo ('<pre>');
 }
 ?>
 
@@ -278,10 +277,10 @@ if ($status == false) {
   </fieldset>
 
   <button id="readGram">OPEN GRAM</button>
-  <table id='gsGramTable'></table>
-  <p>aaa</p>
-  <div id="cy"></div>
+  <p>RDBから動的に作成</p>
   <div id="cy2"></div>
+  <p>ハードコーディングにより静的に作成</p>
+  <div id="cy"></div>
 
 </body>
 
@@ -295,7 +294,6 @@ if ($status == false) {
   let usrDataJS = JSON.parse('<?php echo ($usrDataJson); ?>');
   console.log(myDataJS);
   console.log(usrDataJS);
-  console.log(Object.keys(usrDataJS));
 
 
   //内容要素はJSONオブジェクトである、サーバ側加工しフロントに渡すもの

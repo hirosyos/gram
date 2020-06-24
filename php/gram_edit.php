@@ -33,6 +33,33 @@ if ($status == false) {
   $record = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
+
+// データ取得SQL作成
+
+//ファイル名に使うユーザIDは８桁で０パディングする
+$tableName = "user_table_" . sprintf('%08d', $id);
+$sql2 = "SELECT * FROM $tableName WHERE 1";
+
+// SQL準備&実行
+$stmt2 = $pdo->prepare($sql2);
+$stmt2->bindValue(':id', $id, PDO::PARAM_INT);
+$status2 = $stmt2->execute();
+
+// データ登録処理後
+if ($status2 == false) {
+  // SQL実行に失敗した場合はここでエラーを出力し，以降の処理を中止する
+  $error = $stmt2->errorInfo();
+  echo json_encode(["error_msg" => "{$error[2]}"]);
+  exit();
+} else {
+  // 正常にSQLが実行された場合は指定の11レコードを取得
+  // fetch()関数でSQLで取得したレコードを取得できる
+  $record2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+  // echo ("<pre>");
+  // var_dump($record2);
+  // echo ("<pre>");
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -109,6 +136,45 @@ if ($status == false) {
       <input type="hidden" name="id" value="<?= $record["id"] ?>">
       <input type="hidden" name="created_at" value="<?= $record["created_at"] ?>">
       <input type="hidden" name="updated_at" value="<?= $record["updated_at"] ?>">
+    </fieldset>
+  </form>
+
+  <form action="gram_update_relation.php" method="POST">
+    <fieldset>
+      <legend>GRAM RELATION（編集画面）</legend>
+      <a href="gram_read.php">一覧画面</a>
+
+      <div>
+        id: <?= $record["id"] ?>
+      </div>
+      <div>
+        users_id: <input type="text" name="users_id_1" value="<?= $record2[0]["users_id"] ?>">
+      </div>
+      <div>
+        relation: <input type="text" name="relation_1" value="<?= $record2[0]["relation"] ?>">
+      </div>
+      <div>
+        users_id: <input type="text" name="users_id_2" value="<?= $record2[1]["users_id"] ?>">
+      </div>
+      <div>
+        relation: <input type="text" name="relation_2" value="<?= $record2[1]["relation"] ?>">
+      </div>
+      <div>
+        users_id: <input type="text" name="users_id_3" value="<?= $record2[2]["users_id"] ?>">
+      </div>
+      <div>
+        relation: <input type="text" name="relation_3" value="<?= $record2[2]["relation"] ?>">
+      </div>
+      <div>
+        users_id: <input type="text" name="users_id_4" value="<?= $record2[3]["users_id"] ?>">
+      </div>
+      <div>
+        relation: <input type="text" name="relation_4" value="<?= $record2[3]["relation"] ?>">
+      </div>
+      <div>
+        <button>submit</button>
+      </div>
+      <input type="hidden" name="id" value="<?= $record["id"] ?>">
     </fieldset>
   </form>
 
