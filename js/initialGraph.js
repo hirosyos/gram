@@ -1,6 +1,6 @@
 $(function () {
     //内容要素はJSONオブジェクトである、サーバ側加工しフロントに渡すもの
-    var elements = {
+    let elements = {
         nodes: [
             //グラフの点、ノードのidが必須で、他の属性は機能によって調整するばよい
             // { data: { id: '172', name: 'Tom Cruise', label: 'Person' } },
@@ -41,7 +41,7 @@ $(function () {
     }
 
     //内容要素を表現するCSS
-    var style = [
+    let style = [
         //セレクターで拾いた内容要素が 指定したCSSを適用する
         //ノードの中で、label属性は「Peson」のノードが青色で表示し、文字はname属性を表示する
         {
@@ -71,7 +71,7 @@ $(function () {
     ]
 
     //レイアウト設定
-    var layout = {
+    let layout = {
         //グリッドレイアウトを適用する
         // name: 'fcose',
         // name: 'grid',
@@ -86,7 +86,7 @@ $(function () {
     }
 
     // Cytoscapeオブジェクト初期化。
-    var cy = cytoscape({
+    let cy = cytoscape({
         // containerがHTML内の「cy」DOM要素に指定
         container: document.getElementById('cy'),
         elements: elements,

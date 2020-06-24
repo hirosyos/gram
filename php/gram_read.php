@@ -47,6 +47,43 @@ function readUserData($usrId)
 }
 
 /*************************************
+ * １人のデータを読み出し
+ *  @param ユーザID
+ *  @return ユーザの情報
+ *************************************/
+function readMyData($usrId)
+{
+  // DB接続
+  $pdo = connect_to_db();
+
+  //ファイル名に使うユーザIDは８桁で０パディングする
+  $tableName = "gram_table";
+
+  // データ取得SQL作成
+  $sql = "SELECT * FROM $tableName WHERE users_id = $usrId";
+
+  // SQL準備&実行
+  $stmt = $pdo->prepare($sql);
+  $status = $stmt->execute();
+
+  // データ読み出し処理後
+  if ($status == false) {
+    // SQL実行に失敗した場合はここでエラーを出力し，以降の処理を中止する
+    $error = $stmt->errorInfo();
+    echo json_encode(["error_msg" => "{$error[2]}"]);
+    exit();
+  } else {
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // echo ('<pre>');
+    // var_dump($result);
+    // echo ('<pre>');
+  }
+
+  return $result;
+}
+
+/*************************************
  * gram_read メイン処理開始
  *************************************/
 session_start();
@@ -137,6 +174,7 @@ if ($status == false) {
   unset($value);
 
   for ($i = 1; $i < 9; $i++) {
+    $myData[$i] = readMyData($i);
     $usrData[$i] = readUserData($i);
     // $usrData[2] = readUserData(2);
   }
@@ -147,9 +185,11 @@ if ($status == false) {
 
   $usrData2 = "あああああ";
 
+  $myDataJson = json_encode($myData);
   $usrDataJson = json_encode($usrData);
 
   echo ('<pre>');
+  var_dump($myDataJson);
   var_dump($usrDataJson);
   echo ('<pre>');
 }
@@ -171,12 +211,20 @@ if ($status == false) {
       width: 100%; */
       background-color: #f9f9f9;
     }
+
+    #cy2 {
+      height: 600px;
+      width: 1200px;
+      /* height: 100%;
+      width: 100%; */
+      background-color: #f9f9f9;
+    }
   </style>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.15.1/cytoscape.umd.js"></script>
   <!-- <script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>
   <script src="http://cdn.bootcss.com/cytoscape/2.3.16/cytoscape.min.js"></script> -->
-  <script src="../js/initialGraph.js"></script>
+  <!-- <script src="../js/initialGraph.js"></script> -->
 
 
   <!-- <title>GRAMリスト（一覧画面</title> -->
@@ -233,6 +281,7 @@ if ($status == false) {
   <table id='gsGramTable'></table>
   <p>aaa</p>
   <div id="cy"></div>
+  <div id="cy2"></div>
 
 </body>
 
@@ -242,15 +291,422 @@ if ($status == false) {
 
 
 <script>
+  let myDataJS = JSON.parse('<?php echo ($myDataJson); ?>');
+  let usrDataJS = JSON.parse('<?php echo ($usrDataJson); ?>');
+  console.log(myDataJS);
+  console.log(usrDataJS);
+  console.log(Object.keys(usrDataJS));
+
+
+  //内容要素はJSONオブジェクトである、サーバ側加工しフロントに渡すもの
+  let elements = {
+    nodes: [
+      //グラフの点、ノードのidが必須で、他の属性は機能によって調整するばよい
+      {
+        data: {
+          id: '1',
+          name: 'アルファ',
+          label: 'Person'
+        }
+      },
+      {
+        data: {
+          id: '2',
+          name: 'ブラボー',
+          label: 'Person'
+        }
+      },
+      {
+        data: {
+          id: '3',
+          name: 'チャーリー',
+          label: 'Person'
+        }
+      },
+      {
+        data: {
+          id: '4',
+          name: 'デルタ',
+          label: 'Person'
+        }
+      },
+      {
+        data: {
+          id: '5',
+          name: 'エコー',
+          label: 'Person'
+        }
+      },
+      {
+        data: {
+          id: '6',
+          name: 'フォックス',
+          label: 'Person'
+        }
+      },
+      {
+        data: {
+          id: '7',
+          name: 'ゴルフ',
+          label: 'Person'
+        }
+      },
+      {
+        data: {
+          id: '8',
+          name: 'ホテル',
+          label: 'Person'
+        }
+      },
+    ],
+    edges: [
+      //グラフの線、エッジはsource(開始点id)とtarget(終了点id)は必須で、他の属性も追加可能
+      // { data: { source: '172', target: '183', relationship: 'Acted_In' } },
+      {
+        data: {
+          source: '1',
+          target: '2',
+          relationship: '契約チューター'
+        }
+      },
+      {
+        data: {
+          source: '1',
+          target: '5',
+          relationship: '生徒'
+        }
+      },
+      {
+        data: {
+          source: '1',
+          target: '6',
+          relationship: '生徒'
+        }
+      },
+      {
+        data: {
+          source: '2',
+          target: '1',
+          relationship: '雇用主'
+        }
+      },
+      {
+        data: {
+          source: '2',
+          target: '5',
+          relationship: '生徒'
+        }
+      },
+      {
+        data: {
+          source: '2',
+          target: '6',
+          relationship: '生徒'
+        }
+      },
+      {
+        data: {
+          source: '3',
+          target: '4',
+          relationship: '契約チューター'
+        }
+      },
+      {
+        data: {
+          source: '3',
+          target: '7',
+          relationship: '生徒'
+        }
+      },
+      {
+        data: {
+          source: '3',
+          target: '8',
+          relationship: '生徒'
+        }
+      },
+      {
+        data: {
+          source: '4',
+          target: '3',
+          relationship: '雇用主'
+        }
+      },
+      {
+        data: {
+          source: '4',
+          target: '7',
+          relationship: '生徒'
+        }
+      },
+      {
+        data: {
+          source: '4',
+          target: '8',
+          relationship: '生徒'
+        }
+      },
+      {
+        data: {
+          source: '5',
+          target: '1',
+          relationship: '先生'
+        }
+      },
+      {
+        data: {
+          source: '5',
+          target: '2',
+          relationship: 'チューター'
+        }
+      },
+      {
+        data: {
+          source: '6',
+          target: '1',
+          relationship: '先生'
+        }
+      },
+      {
+        data: {
+          source: '6',
+          target: '2',
+          relationship: 'チューター'
+        }
+      },
+      {
+        data: {
+          source: '7',
+          target: '3',
+          relationship: '先生'
+        }
+      },
+      {
+        data: {
+          source: '7',
+          target: '4',
+          relationship: 'チューター'
+        }
+      },
+      {
+        data: {
+          source: '8',
+          target: '3',
+          relationship: '先生'
+        }
+      },
+      {
+        data: {
+          source: '8',
+          target: '4',
+          relationship: 'チューター'
+        }
+      },
+    ],
+  }
+
+  //内容要素を表現するCSS
+  let style = [
+    //セレクターで拾いた内容要素が 指定したCSSを適用する
+    //ノードの中で、label属性は「Peson」のノードが青色で表示し、文字はname属性を表示する
+    {
+      selector: 'node[label = "Person"]',
+      css: {
+        'background-color': '#6FB1FC',
+        'content': 'data(name)'
+      }
+    },
+    //ノードの中で、label属性は「Movie」のノードがオレンジ色で表示し、文字はtitle属性を表示する
+    {
+      selector: 'node[label = "Movie"]',
+      css: {
+        'background-color': '#F5A45D',
+        'content': 'data(title)'
+      }
+    },
+    //エッジ全体で、文字はrelationship属性を表示する、終了点での矢印は三角形にする
+    {
+      selector: 'edge',
+      css: {
+        'content': 'data(relationship)',
+        'target-arrow-shape': 'triangle',
+        'curve-style': 'unbundled-bezier'
+      }
+    }
+  ]
+
+  //レイアウト設定
+  let layout = {
+    //グリッドレイアウトを適用する
+    // name: 'fcose',
+    // name: 'grid',
+    // name: 'random',
+    // name: 'circle',
+    // name: 'concentric',
+    name: 'breadthfirst',
+    // name: 'cose',
+    // name: 'Edge-weighted Spring Embedded',
+
+
+  }
+
+  // Cytoscapeオブジェクト初期化。
+  let cy = cytoscape({
+    // containerがHTML内の「cy」DOM要素に指定
+    container: document.getElementById('cy'),
+    elements: elements,
+    style: style,
+    layout: layout,
+  });
+
+
+
   //
   // GRAM読み出しクリック時
   //
   $('#readGram').on('click', function() {
     console.log('おされたよ');
+    console.log(Object.keys(usrDataJS).length);
 
 
-    var usrDataJS = JSON.parse('<?php echo ($usrDataJson); ?>');
-    console.log(usrDataJS);
+    let elements = {
+      nodes: [],
+      edges: [],
+    }
+
+    //内容要素を表現するCSS
+    let style = [
+      //セレクターで拾いた内容要素が 指定したCSSを適用する
+      //ノードの中で、label属性は「Peson」のノードが青色で表示し、文字はname属性を表示する
+      {
+        selector: 'node[label = "Person"]',
+        css: {
+          'background-color': '#6FB1FC',
+          'content': 'data(name)'
+        }
+      },
+      //エッジ全体で、文字はrelationship属性を表示する、終了点での矢印は三角形にする
+      {
+        selector: 'edge',
+        css: {
+          'content': 'data(relationship)',
+          'target-arrow-shape': 'triangle',
+          'curve-style': 'unbundled-bezier'
+        }
+      }
+    ]
+
+    //レイアウト設定
+    let layout = {
+      // name: 'fcose',
+      // name: 'grid',
+      // name: 'random',
+      // name: 'circle',
+      // name: 'concentric',
+      name: 'breadthfirst',
+      // name: 'cose',
+    }
+
+    // Cytoscapeオブジェクト初期化。
+    let cy2 = cytoscape({
+      // containerがHTML内の「cy」DOM要素に指定
+      container: document.getElementById('cy2'),
+      elements: elements,
+      style: style,
+      layout: layout,
+    });
+
+
+    // var cy2 = cytoscape({
+    //   container: document.getElementById('cy2'),
+    //   elements: [
+    //     },
+    //     {
+    //       data: {
+    //         id: 'b'
+    //       }
+    //     },
+    //     {
+    //       data: {
+    //         id: 'ab',
+    //         source: 'a',
+    //         target: 'b'
+    //       }
+    //     }
+    //   ],
+    //   style: [{
+    //     selector: 'node',
+    //     style: {
+    //       shape: 'hexagon',
+    //       'background-color': 'red',
+    //       label: 'data(id)'
+    //     }
+    //   }],
+
+    // });
+
+    // for (var i = 0; i < 10; i++) {
+    //   cy2.add({
+    //     data: {
+    //       id: 'node' + i
+    //     }
+    //   });
+    //   var source = 'node' + i;
+    //   cy2.add({
+    //     data: {
+    //       id: 'edge' + i,
+    //       source: source,
+    //       target: (i % 2 == 0 ? 'a' : 'b')
+    //     }
+    //   });
+    // }
+    // cy2.layout({
+    //   name: 'circle'
+    // }).run();
+    // layout.run()    
+    console.log(Object.keys(usrDataJS).length);
+
+
+    for (let i = 1; i < 9; i++) {
+      for (let j = 0; j < myDataJS[i].length; j++) {
+        console.log(`私は${i}`);
+        cy2.add({
+          group: 'nodes',
+          data: {
+            id: `${i}`,
+            name: `${myDataJS[i][j].nick_name}`,
+            label: 'Person'
+          }
+        });
+      }
+    }
+
+    for (let i = 1; i < 9; i++) {
+      console.log(`関係の数は${usrDataJS[i].length}`);
+      for (let j = 0; j < usrDataJS[i].length; j++) {
+
+        console.log(`あなたは${usrDataJS[i][j].users_id}`);
+        console.log(`関係は${usrDataJS[i][j].relation}`);
+        // console.log(Object.keys(usrDataJS)[i]);
+        // console.log(usrDataJS[Object.keys(usrDataJS)[i]][j].users_id);
+        // console.log(usrDataJS[Object.keys(usrDataJS)[i]][j].relation);
+        cy2.add({
+          group: 'edges',
+          data: {
+            source: `${i}`,
+            target: `${usrDataJS[i][j].users_id}`,
+            relationship: `${usrDataJS[i][j].relation}`,
+          }
+        });
+      }
+    }
+
+    cy2.layout({
+      name: 'breadthfirst',
+    }).run();
+
+
+
 
   });
 </script>
