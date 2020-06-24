@@ -165,6 +165,7 @@ if ($status2 == false) {
       <div>
         relation: <input type="text" name="relation_3" value="<?= $record2[2]["relation"] ?>">
       </div>
+      <p>限定仕様、追加できるのは以下のフォームのみ</p>
       <div>
         users_id: <input type="text" name="users_id_4" value="<?= $record2[3]["users_id"] ?>">
       </div>
