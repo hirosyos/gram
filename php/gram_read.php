@@ -11,6 +11,8 @@ function readAllUserData()
 
 /*************************************
  * １人のユーザーの関連データを読み出し
+ *  @param ユーザID
+ *  @return ユーザIDの関連テーブル
  *************************************/
 function readUserData($usrId)
 {
@@ -23,22 +25,9 @@ function readUserData($usrId)
   // データ取得SQL作成
   $sql = "SELECT * FROM $tableName";
 
-  // $sql = "SELECT * FROM user_table_00000001";
-
-  var_dump($sql);
-
   // SQL準備&実行
   $stmt = $pdo->prepare($sql);
-
-  echo ("<pre>");
-  var_dump($stmt);
-  echo ("<pre>");
-
   $status = $stmt->execute();
-
-  echo ("<pre>");
-  var_dump($status);
-  echo ("<pre>");
 
   // データ読み出し処理後
   if ($status == false) {
@@ -49,9 +38,9 @@ function readUserData($usrId)
   } else {
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    echo ('<pre>');
-    var_dump($result);
-    echo ('<pre>');
+    // echo ('<pre>');
+    // var_dump($result);
+    // echo ('<pre>');
   }
 
   return $result;
@@ -69,11 +58,12 @@ check_session_id();
 $pdo = connect_to_db();
 
 // データ取得SQL作成
-// $sql = 'SELECT * FROM gram_table';
-$sql = 'SELECT * FROM gram_table 
-        LEFT OUTER JOIN cource_table
-        ON gram_table.cource_id = cource_table.cource_id';
-// $sql = 'SELECT * FROM cource_table';
+$sql = 'SELECT * FROM 
+          gram_table 
+        LEFT OUTER JOIN 
+          cource_table
+        ON 
+          gram_table.cource_id = cource_table.cource_id';
 
 // SQL準備&実行
 $stmt = $pdo->prepare($sql);
@@ -94,17 +84,13 @@ if ($status == false) {
   echo json_encode(["error_msg" => "{$error[2]}"]);
   exit();
 } else {
+
   // 正常にSQLが実行された場合は入力ページファイルに移動し，入力ページの処理を実行する
   // fetchAll()関数でSQLで取得したレコードを配列で取得できる
-  $result = $stmt->fetchAll(PDO::FETCH_ASSOC);  // データの出力用変数（初期値は空文字）を設定
+  $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-  // echo ('<pre>');
-  // var_dump($result);
-  // echo ('<pre>');
-
+  // HTML出力
   $output = "";
-  // <tr><td>deadline</td><td>todo</td><tr>の形になるようにforeachで順番に$outputへデータを追加
-  // `.=`は後ろに文字列を追加する，の意味
   $valCnt = 0;
   foreach ($result as $record) {
     $output .= "<tr>";
@@ -150,10 +136,21 @@ if ($status == false) {
   // 今回は以降foreachしないので影響なし
   unset($value);
 
-  $usr1Data = readUserData(1);
+  for ($i = 1; $i < 9; $i++) {
+    $usrData[$i] = readUserData($i);
+    // $usrData[2] = readUserData(2);
+  }
 
   echo ('<pre>');
-  var_dump($usr1Data);
+  var_dump($usrData);
+  echo ('<pre>');
+
+  $usrData2 = "あああああ";
+
+  $usrDataJson = json_encode($usrData);
+
+  echo ('<pre>');
+  var_dump($usrDataJson);
   echo ('<pre>');
 }
 ?>
@@ -165,9 +162,26 @@ if ($status == false) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../css/style.css">
+  <style type="text/css">
+    /* cytoscape graph */
+    #cy {
+      height: 600px;
+      width: 1200px;
+      /* height: 100%;
+      width: 100%; */
+      background-color: #f9f9f9;
+    }
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.15.1/cytoscape.umd.js"></script>
+  <!-- <script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>
+  <script src="http://cdn.bootcss.com/cytoscape/2.3.16/cytoscape.min.js"></script> -->
+  <script src="../js/initialGraph.js"></script>
+
 
   <!-- <title>GRAMリスト（一覧画面</title> -->
   <title><?= $title ?></title>
+
 </head>
 
 <header>
@@ -215,15 +229,30 @@ if ($status == false) {
     </table>
   </fieldset>
 
-  <button id="readGsGram">OPEN GRAM</button>
+  <button id="readGram">OPEN GRAM</button>
   <table id='gsGramTable'></table>
-
-  <footer>
-    <p>統一期とは東京DEVの期を基準とし、東京LABは7期、福岡DEVは10期、福岡LABは13期足し合わせたものである</p>
-  </footer>
-
-
+  <p>aaa</p>
+  <div id="cy"></div>
 
 </body>
+
+<footer>
+  <p>統一期とは東京DEVの期を基準とし、東京LABは7期、福岡DEVは10期、福岡LABは13期足し合わせたものである</p>
+</footer>
+
+
+<script>
+  //
+  // GRAM読み出しクリック時
+  //
+  $('#readGram').on('click', function() {
+    console.log('おされたよ');
+
+
+    var usrDataJS = JSON.parse('<?php echo ($usrDataJson); ?>');
+    console.log(usrDataJS);
+
+  });
+</script>
 
 </html>

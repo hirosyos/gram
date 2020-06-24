@@ -28,3 +28,15 @@ form {
 form ul {
     list-style: none;
 }
+
+/* Cytoscape.js 書き出し場所定義*/
+/* #cy {
+    height: 300px;
+    width: 400px;
+    background-color: #f9f9f9;
+} */
+
+/* #cy {
+    width: 100%;
+    display: block;
+} */
