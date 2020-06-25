@@ -13,6 +13,10 @@ main {
     font-size: 22px;
     text-align: center;
     flex-direction: column;
+    font-family: 'Noto Sans', sans-serif;
+}
+body{
+    font-family: 'Noto Sans', sans-serif; 
 }
 table,
 tr,
